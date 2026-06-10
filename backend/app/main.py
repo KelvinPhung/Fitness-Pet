@@ -7,8 +7,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.database import engine, Base
 from app.config import settings
 
-# Import routers (will be added in later phases)
-# from app.routers import auth, users, pets, activities, friends
+# Import routers
+from app.routers import auth
 
 # Create database tables
 Base.metadata.create_all(bind=engine)
@@ -33,8 +33,8 @@ def create_app():
         allow_headers=["*"],
     )
     
-    # Include routers (will be added in later phases)
-    # app.include_router(auth.router, prefix="/api/auth", tags=["auth"])
+    # Include routers
+    app.include_router(auth.router)
     # app.include_router(users.router, prefix="/api/users", tags=["users"])
     # app.include_router(pets.router, prefix="/api/pets", tags=["pets"])
     # app.include_router(activities.router, prefix="/api/activities", tags=["activities"])

@@ -1,7 +1,7 @@
 """
 Authentication endpoints
 """
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Header
 from sqlalchemy.orm import Session
 
 from app.database import get_db
@@ -107,14 +107,14 @@ def login(
 
 
 def get_current_user(
-    token: str = None,
+    authorization: str = Header(None),
     db: Session = Depends(get_db)
 ) -> TokenData:
     """
     Dependency to extract and verify current user from JWT token
     
     Args:
-        token: JWT token from Authorization header
+        authorization: Authorization header
         db: Database session
         
     Returns:
@@ -123,17 +123,23 @@ def get_current_user(
     Raises:
         HTTPException: If token is invalid or expired
     """
-    if not token:
+    if not authorization:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Not authenticated",
             headers={"WWW-Authenticate": "Bearer"},
         )
     
-    # Remove "Bearer " prefix if present
-    if token.startswith("Bearer "):
-        token = token[7:]
+    # Extract token from "Bearer <token>"
+    parts = authorization.split()
+    if len(parts) != 2 or parts[0].lower() != "bearer":
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid authorization header",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
     
+    token = parts[1]
     token_data = TokenService.verify_token(token)
     
     if token_data is None:
