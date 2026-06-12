@@ -8,7 +8,7 @@ from app.database import engine, Base
 from app.config import settings
 
 # Import routers
-from app.routers import auth
+from app.routers import auth, pets
 
 # Create database tables
 Base.metadata.create_all(bind=engine)
@@ -35,10 +35,9 @@ def create_app():
     
     # Include routers
     app.include_router(auth.router)
-    # app.include_router(users.router, prefix="/api/users", tags=["users"])
-    # app.include_router(pets.router, prefix="/api/pets", tags=["pets"])
-    # app.include_router(activities.router, prefix="/api/activities", tags=["activities"])
-    # app.include_router(friends.router, prefix="/api/friends", tags=["friends"])
+    app.include_router(pets.router)
+    # app.include_router(activities.router)
+    # app.include_router(friends.router)
     
     @app.get("/")
     def read_root():
